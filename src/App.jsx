@@ -18,11 +18,12 @@ import products from './data/products.json';
 
 function App() {
   const [orderItems, setOrderItems] = useState([]);
-  const [generalNote, setGeneralNote] = useState("");
+  const [generalNote, setGeneralNote] = useState('');
+  const [generatedJson, setGeneratedJson] = useState(null);
 
   const handleAddToOrder = (product) => {
     if (!orderItems.find((item) => item.id === product.id)) {
-      setOrderItems([...orderItems, { ...product, quantity: 1, productNote: "" }]);
+      setOrderItems([...orderItems, { ...product, quantity: 1, productNote: '' }]);
     }
   };
 
@@ -46,6 +47,20 @@ function App() {
     setOrderItems(orderItems.map((item) =>
       item.id === id ? { ...item, productNote: note } : item
     ));
+  };
+
+  const handleSubmitOrder = () => {
+    const json = {
+      pospointId: 'restaurant1',
+      ordernote: generalNote,
+      products: orderItems.map((item) => ({
+        id: item.id,
+        price: item.price,
+        quantity: item.quantity,
+        note: item.productNote || ''
+      }))
+    };
+    setGeneratedJson(json);
   };
 
   return (
@@ -109,7 +124,10 @@ function App() {
 
                 <Grid>
                   <Grid container spacing={1} alignItems="center">
-                    <Button onClick={() => handleDecreaseQuantity(item.id)} disabled={item.quantity <= 1}>
+                    <Button
+                      onClick={() => handleDecreaseQuantity(item.id)}
+                      disabled={item.quantity <= 1}
+                    >
                       -
                     </Button>
                     <Typography>{item.quantity}</Typography>
@@ -148,6 +166,21 @@ function App() {
               sx={{ mt: 2 }}
             />
           </CardContent>
+
+          <Button variant="contained" fullWidth onClick={handleSubmitOrder}>
+            Submit Order
+          </Button>
+
+          {generatedJson && (
+            <Paper sx={{ mt: 2, p: 2, borderRadius: 2 }}>
+              <Typography variant="h6" gutterBottom>
+                Generated Order JSON:
+              </Typography>
+              <pre style={{ whiteSpace: 'pre-wrap' }}>
+                {JSON.stringify(generatedJson, null, 2)}
+              </pre>
+            </Paper>
+          )}
         </Card>
       )}
     </Container>
