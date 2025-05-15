@@ -3,11 +3,14 @@ import { Container, Typography, Box } from '@mui/material';
 import Menu from './Menu';
 import OrderSummary from './OrderSummary';
 import { generateOrderJson } from './utils';
+import products from './data/products.json';
 
 function App() {
   const [orderItems, setOrderItems] = useState([]);
   const [generalNote, setGeneralNote] = useState('');
   const [generatedJson, setGeneratedJson] = useState(null);
+  const [searchTerm, setSearchTerm] = useState("")
+  const [selectedCategory, setSelectedCategory] = useState(null)
 
   const handleAddToOrder = (product) => {
     if (!orderItems.find((item) => item.id === product.id)) {
@@ -38,11 +41,28 @@ function App() {
   };
 
   const handleSubmitOrder = () => {
-    const json = generateOrderJson(orderItems, generalNote);
+    const json = generateOrderJson(orderItems, generalNote, totalPrice);
     setGeneratedJson(json);
   };
 
-  return (
+  const totalPrice = orderItems.reduce((total, item)=> total + item.price * item.quantity, 0)
+
+  const filteredProducts = products.filter((p) => {
+    const matchesCategory = selectedCategory ? p.category.name === selectedCategory : true;
+    const matchesSearch = searchTerm ? p.name.toLowerCase().includes(searchTerm.toLowerCase()): true;
+    return matchesCategory && matchesSearch
+  })
+  
+  const categories = [...new Set(products.map(p => p.category.name))];
+
+  const handleClearOrder = () => {
+    if (window.confirm("Are you sure you want to clear the order?")) {
+      setOrderItems([]);
+      setGeneralNote('');
+      setGeneratedJson(null)
+    }
+  }
+return (
     <Container
       maxWidth="lg"
       sx={{
@@ -66,7 +86,14 @@ function App() {
       </Typography>
 
       <Box sx={{ mb: 4 }}>
-        <Menu handleAddToOrder={handleAddToOrder} />
+        <Menu 
+         handleAddToOrder={handleAddToOrder}
+         filteredProducts={filteredProducts}
+         setSearchTerm={setSearchTerm}
+         selectedCategory={selectedCategory}
+         setSelectedCategory={setSelectedCategory}
+         categories={categories}
+         />
       </Box>
 
       <Box sx={{ mt: 2 }}>
@@ -80,6 +107,8 @@ function App() {
           handleProductNoteChange={handleProductNoteChange}
           handleSubmitOrder={handleSubmitOrder}
           generatedJson={generatedJson}
+          totalPrice={totalPrice}
+          handleClearOrder={handleClearOrder}
         />
       </Box>
     </Container>

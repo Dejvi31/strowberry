@@ -23,13 +23,15 @@ function OrderSummary({
   handleDecreaseQuantity,
   handleProductNoteChange,
   handleSubmitOrder,
-  generatedJson
+  generatedJson,
+  totalPrice,
+  handleClearOrder
 }) {
   return (
     orderItems.length > 0 && (
       <Grid container spacing={3} sx={{ mt: 4 }}>
       
-        <Grid item xs={12} sm={6}>
+        <Grid>
           <Card sx={{ borderRadius: 3, boxShadow: 4 }}>
             <CardContent>
               <Typography variant="h5" gutterBottom textAlign="center">
@@ -111,14 +113,29 @@ function OrderSummary({
               </Box>
             </CardContent>
 
+             <Typography variant="h5" gutterBottom textAlign="center">
+                Totali: {totalPrice} L
+              </Typography>
+
+          <Box display='flex' gap={2} padding={1}>
+            <Button
+              variant="outlined"
+              color="error"
+              onClick={handleClearOrder}
+              sx={{ mt: 2, ml: 2 }}
+            >
+              Clear Order
+            </Button>
+
             <Button variant="contained" color="primary" fullWidth sx={{ mt: 2 }} onClick={handleSubmitOrder}>
               Submit Order
             </Button>
+            </Box>
           </Card>
         </Grid>
 
        
-        <Grid item xs={12} sm={6}>
+        <Grid >
           {generatedJson && (
             <Paper sx={{ p: 2, borderRadius: 3, backgroundColor: '#f5f5f5' }}>
               <Typography variant="h6" gutterBottom>
